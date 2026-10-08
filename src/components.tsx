@@ -1,17 +1,17 @@
 import { useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarBlank, CaretDown, ChartBar, ChatsCircle, ClipboardText, ClockCounterClockwise, FileText, FirstAidKit, Gear, House, List, MagnifyingGlass, SignOut, Stethoscope, Users, X, Bell, ShieldCheck, Briefcase, UserCircle, CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { CalendarBlank, ChartBar, ChatsCircle, ClipboardText, ClockCounterClockwise, FileText, Gear, House, List, MagnifyingGlass, SignOut, Stethoscope, Users, X, Bell, ShieldCheck, Briefcase, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import { useStore } from './store';
-import type { AppointmentStatus, Role } from './domain';
+import type { AppointmentStatus } from './domain';
 
-export function Logo({ compact = false }: { compact?: boolean }) { return <Link to="/" className="logo" aria-label="CareOrbit home"><span className="logo-mark"><FirstAidKit weight="fill" /></span>{compact ? null : <span>Care<span>Orbit</span></span>}</Link>; }
+export function Logo({ compact = false }: { compact?: boolean }) { return <Link to="/" className="logo" aria-label="CareOrbit home"><span className="logo-mark"><img src="/assets/careorbit-logo.png" alt="" /></span>{compact ? null : <span>Care<span>Orbit</span></span>}</Link>; }
 const patientNav = [['Overview','/app'],['Find a doctor','/app/doctors'],['Appointments','/app/appointments'],['Documents','/app/documents'],['Messages','/app/messages'],['History','/app/history'],['Notifications','/app/notifications'],['Settings','/app/settings']] as const;
 const doctorNav = [['Overview','/doctor'],['Appointments','/doctor/appointments'],['Calendar','/doctor/calendar'],['Availability','/doctor/availability'],['Patient workspace','/doctor/workspace'],['Messages','/doctor/messages'],['Profile & clinics','/doctor/profile'],['Settings','/doctor/settings']] as const;
 const adminNav = [['Overview','/admin'],['Patients','/admin/patients'],['Doctors','/admin/doctors'],['Appointments','/admin/appointments'],['Reports','/admin/reports'],['Audit log','/admin/audit'],['Processing jobs','/admin/jobs'],['Settings','/admin/settings']] as const;
 const icons: Record<string, ReactNode> = { Overview:<House/>, 'Find a doctor':<MagnifyingGlass/>, Appointments:<CalendarBlank/>, Documents:<FileText/>, Messages:<ChatsCircle/>, History:<ClockCounterClockwise/>, Notifications:<Bell/>, Settings:<Gear/>, Calendar:<CalendarBlank/>, Availability:<ClockCounterClockwise/>, 'Patient workspace':<ClipboardText/>, 'Profile & clinics':<Stethoscope/>, Patients:<Users/>, Doctors:<Stethoscope/>, Reports:<ChartBar/>, 'Audit log':<ShieldCheck/>, 'Processing jobs':<Briefcase/> };
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user, role, switchRole, logout, notifications } = useStore(); const [open, setOpen] = useState(false); const navigate = useNavigate(); const location = useLocation();
+  const { user, role, logout, notifications } = useStore(); const [open, setOpen] = useState(false); const navigate = useNavigate(); const location = useLocation();
   const nav = role === 'patient' ? patientNav : role === 'doctor' ? doctorNav : adminNav;
   const title = nav.find(([, href]) => href === location.pathname)?.[0] ?? 'CareOrbit';
   return <div className="app-shell">
@@ -20,7 +20,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="side-footer"><div className="privacy-note"><ShieldCheck/><div><strong>Private by design</strong><span>Your health data stays protected.</span></div></div><button className="nav-button" onClick={() => { logout(); navigate('/login'); }}><SignOut/>Sign out</button></div>
     </aside>
     {open ? <button className="scrim" onClick={() => setOpen(false)} aria-label="Close navigation"/> : null}
-    <main><header className="topbar"><button className="icon-btn mobile-only" onClick={() => setOpen(true)} aria-label="Open menu"><List/></button><div><p>{new Date().toLocaleDateString('en-PK', { weekday:'long', day:'numeric', month:'long' })}</p><h1>{title}</h1></div><div className="top-actions"><Link className="icon-btn notification-button" to={`/${role === 'patient' ? 'app' : role}/notifications`} aria-label="Notifications"><Bell/>{notifications.some(n => !n.read) ? <i/> : null}</Link><label className="role-switch"><span className="sr-only">Preview role</span><select value={role} onChange={e => { const next = e.target.value as Role; switchRole(next); navigate(next === 'patient' ? '/app' : `/${next}`); }}><option value="patient">Patient view</option><option value="doctor">Doctor view</option><option value="admin">Admin view</option></select><CaretDown/></label><div className="avatar">{user?.avatar}</div><div className="user-meta"><strong>{user?.name}</strong><span>{role}</span></div></div></header><div className="page">{children}</div></main>
+    <main><header className="topbar"><button className="icon-btn mobile-only" onClick={() => setOpen(true)} aria-label="Open menu"><List/></button><div><p>{new Date().toLocaleDateString('en-PK', { weekday:'long', day:'numeric', month:'long' })}</p><h1>{title}</h1></div><div className="top-actions"><Link className="icon-btn notification-button" to={role === 'patient' ? '/app/notifications' : role === 'doctor' ? '/doctor/messages' : '/admin/jobs'} aria-label="Notifications"><Bell/>{notifications.some(n => !n.read) ? <i/> : null}</Link><div className="avatar">{user?.avatar}</div><div className="user-meta"><strong>{user?.name}</strong><span>{role}</span></div></div></header><div className="page">{children}</div></main>
   </div>;
 }
 

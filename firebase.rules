@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function roleIs(role) { return signedIn() && (request.auth.token.role == role || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role); }
+    function ownsPatient(patientId) { return roleIs('patient') && request.auth.uid == patientId; }
+    function ownsDoctor(doctorId) { return roleIs('doctor') && request.auth.uid == doctorId; }
+
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create: if signedIn() && request.auth.uid == userId
+        && request.resource.data.role in ['patient', 'doctor']
+        && request.resource.data.status in ['active', 'pending'];
+      allow update: if signedIn() && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role','status','verified']);
+      allow delete: if false;
+    }
+    match /doctorProfiles/{doctorId} {
+      allow read: if resource.data.verified == true && resource.data.status == 'active';
+      allow create: if ownsDoctor(doctorId) && request.resource.data.userId == request.auth.uid;
+      allow update: if ownsDoctor(doctorId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verified','status','reviewedBy','reviewedAt']);
+      allow delete: if false;
+    }
+    match /patientProfiles/{patientId} {
+      allow read, create, update: if ownsPatient(patientId) && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+    match /appointments/{appointmentId} {
+      allow read: if signedIn() && (ownsPatient(resource.data.patientId) || ownsDoctor(resource.data.doctorId) || roleIs('admin'));
+      allow write: if false; // Cloud Function enforces conflicts, transitions and idempotency
+    }
+    match /documents/{documentId} {
+      allow read: if ownsPatient(resource.data.ownerId);
+      allow write: if false; // signed uploads and grant checks belong in Cloud Functions
+    }
+    match /conversations/{conversationId} { allow read, write: if false; }
+    match /messages/{messageId} { allow read, write: if false; }
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.recipientId == request.auth.uid;
+      allow write: if false;
+    }
+    match /auditEvents/{eventId} { allow read: if roleIs('admin'); allow write: if false; }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
