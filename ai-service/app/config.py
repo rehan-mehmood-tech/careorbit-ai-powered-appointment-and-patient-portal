@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     groq_model: str = "llama-3.3-70b-versatile"
     firebase_project_id: str = "careorbit-ai-power-healthcare"
+    google_application_credentials: str = ""
     allowed_origins: str = "http://127.0.0.1:5173,http://localhost:5173"
     checkpoint_db: str = "./data/checkpoints.sqlite"
     prompt_version: str = "careorbit-intake-v1"

@@ -11,10 +11,12 @@ def initialize_firebase() -> None:
     if firebase_admin._apps:
         return
     settings = get_settings()
-    try:
-        firebase_admin.initialize_app(options={"projectId": settings.firebase_project_id})
-    except Exception:
-        firebase_admin.initialize_app(credentials.ApplicationDefault(), {"projectId": settings.firebase_project_id})
+    credential = (
+        credentials.Certificate(settings.google_application_credentials)
+        if settings.google_application_credentials
+        else credentials.ApplicationDefault()
+    )
+    firebase_admin.initialize_app(credential, {"projectId": settings.firebase_project_id})
 
 
 def database():

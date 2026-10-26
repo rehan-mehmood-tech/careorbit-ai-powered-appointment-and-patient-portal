@@ -21,6 +21,10 @@ dev = ["pytest>=8.3,<10", "pytest-asyncio>=0.25,<2", "httpx>=0.28,<1", "ruff>=0.
 [tool.fastapi]
 entrypoint = "app.main:app"
 
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["data*", "scripts*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 asyncio_mode = "auto"
