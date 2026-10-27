@@ -2,7 +2,7 @@
   "name": "careorbit",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["client", "server", "worker"],
+  "workspaces": ["client", "server", "worker", "database"],
   "scripts": {
     "install:all": "npm ci && npm run ai:install",
     "ai:install": "node scripts/ai-service.mjs install",
@@ -18,6 +18,11 @@
     "build:ai": "node scripts/ai-service.mjs check",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "db:migrate": "npm run migrate --workspace @careorbit/database",
+    "db:rollback": "npm run rollback --workspace @careorbit/database",
+    "db:seed": "npm run seed --workspace @careorbit/database",
+    "db:verify": "npm run verify --workspace @careorbit/database",
+    "db:setup": "npm run db:migrate && npm run db:seed && npm run db:verify",
     "infra:up": "docker compose up -d --wait",
     "infra:down": "docker compose down",
     "infra:logs": "docker compose logs -f"

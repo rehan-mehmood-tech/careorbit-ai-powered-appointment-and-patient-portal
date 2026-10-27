@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **0 / 25**
-- Completed trackable checkboxes: **44 / 346**
-- Current active phase: **Phase 1 — Target architecture and repository foundation**
+- Completed phases: **1 / 25**
+- Completed trackable checkboxes: **66 / 346**
+- Current active phase: **Phase 2 — Complete; Phase 3 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -102,34 +102,34 @@ Objective: implement the Section 9 relational model and database-enforced integr
 
 ### Implementation tasks
 
-- [ ] Select and configure the TypeScript ORM/query layer and migration tool.
-- [ ] Create users, sessions, email-verification, and password-reset tables.
-- [ ] Create patient profiles, doctor profiles, verification applications/artifacts, specialties, languages, clinics, and mapping tables.
-- [ ] Create availability rules and date-specific exception tables with IANA timezone fields.
-- [ ] Create appointments and append-only appointment events with UTC intervals, snapshots, status, idempotency key, and reschedule links.
-- [ ] Add doctor active-interval exclusion/locking enforcement including buffers.
-- [ ] Add patient overlapping-appointment prevention.
-- [ ] Create documents, access grants, AI consents, AI jobs, summaries, and review tables.
-- [ ] Create encounters, notes, note versions, visibility, finalize, and amendment fields.
-- [ ] Create conversations, messages, attachments, idempotency IDs, and delivery/read receipts.
-- [ ] Create notifications, delivery attempts, preferences, durable jobs, retry, expiry, and deduplication fields.
-- [ ] Create immutable audit events with minimally necessary metadata.
-- [ ] Create placeholder migration boundaries for payment, calendar, video, and prescription tables.
-- [ ] Add foreign keys, unique constraints, status checks, normalized-email uniqueness, and deletion policies.
-- [ ] Add indexes for directory filters, doctor/patient time queries, conversation cursors, due jobs, grants, and admin reports.
-- [ ] Create deterministic, idempotent synthetic seed data with consistent personas and dates.
-- [ ] Document migration forward, rollback, and production deployment procedures.
+- [x] Select and configure the TypeScript ORM/query layer and migration tool.
+- [x] Create users, sessions, email-verification, and password-reset tables.
+- [x] Create patient profiles, doctor profiles, verification applications/artifacts, specialties, languages, clinics, and mapping tables.
+- [x] Create availability rules and date-specific exception tables with IANA timezone fields.
+- [x] Create appointments and append-only appointment events with UTC intervals, snapshots, status, idempotency key, and reschedule links.
+- [x] Add doctor active-interval exclusion/locking enforcement including buffers.
+- [x] Add patient overlapping-appointment prevention.
+- [x] Create documents, access grants, AI consents, AI jobs, summaries, and review tables.
+- [x] Create encounters, notes, note versions, visibility, finalize, and amendment fields.
+- [x] Create conversations, messages, attachments, idempotency IDs, and delivery/read receipts.
+- [x] Create notifications, delivery attempts, preferences, durable jobs, retry, expiry, and deduplication fields.
+- [x] Create immutable audit events with minimally necessary metadata.
+- [x] Create placeholder migration boundaries for payment, calendar, video, and prescription tables.
+- [x] Add foreign keys, unique constraints, status checks, normalized-email uniqueness, and deletion policies.
+- [x] Add indexes for directory filters, doctor/patient time queries, conversation cursors, due jobs, grants, and admin reports.
+- [x] Create deterministic, idempotent synthetic seed data with consistent personas and dates.
+- [x] Document migration forward, rollback, and production deployment procedures.
 
 ### Security requirements
 
-- [ ] Use a least-privilege application database role and a separate migration role.
-- [ ] Ensure no raw clinical/document/chat body is written to audit or operational log tables.
+- [x] Use a least-privilege application database role and a separate migration role.
+- [x] Ensure no raw clinical/document/chat body is written to audit or operational log tables.
 
 ### Acceptance gate
 
-- [ ] Migrations apply from an empty database and roll back safely in a disposable environment.
-- [ ] Database tests prove normalized-email uniqueness, foreign-key integrity, terminal appointment states, and overlap prevention.
-- [ ] Representative query plans use the intended indexes without N+1 access patterns.
+- [x] Migrations apply from an empty database and roll back safely in a disposable environment.
+- [x] Database tests prove normalized-email uniqueness, foreign-key integrity, terminal appointment states, and overlap prevention.
+- [x] Representative query plans use the intended indexes without N+1 access patterns.
 
 ---
 

@@ -5,6 +5,10 @@ client/dist
 server/dist
 worker/dist
 .python312
+.postgresql17
+.postgresql17.zip
+.pgdata
+.runtime
 .venv
 ai-service/.venv
 __pycache__/
