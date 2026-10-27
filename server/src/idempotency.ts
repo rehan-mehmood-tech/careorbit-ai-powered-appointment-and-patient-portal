@@ -8,6 +8,8 @@ const keyPattern = /^[A-Za-z0-9_.:-]{8,128}$/;
 export function idempotency(pool: Pool): RequestHandler {
   return async (request, response, next) => {
     if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return next();
+    // Appointment commands own idempotency inside the same serializable transaction as capacity changes.
+    if (request.path.startsWith('/api/v1/appointments')) return next();
     const key = request.header('idempotency-key');
     if (!key) return next();
     if (!keyPattern.test(key)) return next(new AppError(422, 'INVALID_IDEMPOTENCY_KEY', 'Idempotency-Key must be 8-128 safe characters'));

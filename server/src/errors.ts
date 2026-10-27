@@ -15,7 +15,7 @@ export const apiErrors = {
   conflict: () => new AppError(409, 'RESOURCE_CONFLICT', 'The request conflicts with current resource state'),
 };
 
-type PgLikeError = Error & { code?: string; type?: string };
+type PgLikeError = Error & { code?: string; type?: string; position?: string };
 
 function normalizeError(error: unknown): AppError {
   if (error instanceof AppError) return error;
@@ -34,7 +34,7 @@ export const notFoundHandler: RequestHandler = (_request, _response, next) => {
 export const errorHandler: ErrorRequestHandler = (source, _request, response, _next) => {
   const error = normalizeError(source);
   const requestId = response.locals.requestId as string;
-  if (error.status >= 500) safeLog('error', 'http.failure', { requestId, errorType: source instanceof Error ? source.name : 'UnknownError' });
+  if (error.status >= 500) safeLog('error', 'http.failure', { requestId, errorType: source instanceof Error ? source.name : 'UnknownError', errorCode: (source as PgLikeError)?.code ?? 'UNCLASSIFIED', errorPosition:(source as PgLikeError)?.position??'none' });
   response.status(error.status).json({
     error: {
       code: error.code,

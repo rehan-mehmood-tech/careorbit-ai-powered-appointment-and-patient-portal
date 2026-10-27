@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **6 / 25**
-- Completed trackable checkboxes: **131 / 346**
-- Current active phase: **Phase 7 — Complete; Phase 8 is next in sequence**
+- Completed phases: **7 / 25**
+- Completed trackable checkboxes: **145 / 346**
+- Current active phase: **Phase 8 — Complete; Phase 9 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -282,26 +282,26 @@ Objective: implement the complete auditable state machine and recovery behavior.
 ### Implementation tasks
 
 - [x] Booking stepper and role-specific appointment lifecycle controls exist as UI prototypes.
-- [ ] Implement appointment create/list/detail endpoints with doctor, patient, clinic/mode, UTC interval, timezone, fee/currency snapshot, reason, shared-document IDs, status, and policy snapshot.
-- [ ] Require an idempotency key and transactionally recheck slot and price at submission.
-- [ ] Default new bookings to Scheduled and optionally support explicitly configured auto-confirmation.
-- [ ] Enforce Scheduled → Confirmed/Cancelled/Declined and Confirmed → Completed/Cancelled/No-show only.
-- [ ] Enforce actor permissions, confirmation deadline, cancellation cutoff, and no-show grace period.
-- [ ] Record every transition as an append-only event with actor, reason, timestamp, policy outcome, and notification event.
-- [ ] Release capacity on decline/cancel and expire stale Scheduled requests through durable jobs.
-- [ ] Implement atomic rescheduling that reserves the replacement before releasing the original and links both records/events.
-- [ ] Preserve the original booking if replacement reservation fails and return refreshed alternatives on 409.
-- [ ] Invalidate/reschedule future reminders and external integration events after changes.
-- [ ] Wire patient and doctor appointment screens to persisted API state, filters, list/calendar, and history timeline.
+- [x] Implement appointment create/list/detail endpoints with doctor, patient, clinic/mode, UTC interval, timezone, fee/currency snapshot, reason, shared-document IDs, status, and policy snapshot.
+- [x] Require an idempotency key and transactionally recheck slot and price at submission.
+- [x] Default new bookings to Scheduled and optionally support explicitly configured auto-confirmation.
+- [x] Enforce Scheduled → Confirmed/Cancelled/Declined and Confirmed → Completed/Cancelled/No-show only.
+- [x] Enforce actor permissions, confirmation deadline, cancellation cutoff, and no-show grace period.
+- [x] Record every transition as an append-only event with actor, reason, timestamp, policy outcome, and notification event.
+- [x] Release capacity on decline/cancel and expire stale Scheduled requests through durable jobs.
+- [x] Implement atomic rescheduling that reserves the replacement before releasing the original and links both records/events.
+- [x] Preserve the original booking if replacement reservation fails and return refreshed alternatives on 409.
+- [x] Invalidate/reschedule future reminders and external integration events after changes.
+- [x] Wire patient and doctor appointment screens to persisted API state, filters, list/calendar, and history timeline.
 
 ### Security requirements
 
-- [ ] Authorize every appointment read/transition by participant or permitted operator and prevent terminal-state mutation.
+- [x] Authorize every appointment read/transition by participant or permitted operator and prevent terminal-state mutation.
 
 ### Acceptance gate
 
-- [ ] Double-click/retry does not duplicate a booking; fee snapshots remain unchanged; completed visits cannot be routinely altered.
-- [ ] Concurrent booking and atomic-reschedule rollback tests pass.
+- [x] Double-click/retry does not duplicate a booking; fee snapshots remain unchanged; completed visits cannot be routinely altered.
+- [x] Concurrent booking and atomic-reschedule rollback tests pass.
 
 ---
 

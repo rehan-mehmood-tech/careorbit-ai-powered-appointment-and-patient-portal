@@ -28,6 +28,10 @@ const environmentSchema = z.object({
   COOKIE_DOMAIN: z.string().optional(),
   PRIVATE_UPLOAD_DIR: z.string().min(1).default('../.runtime/verification-artifacts'),
   VERIFICATION_MAX_FILE_BYTES: z.coerce.number().int().min(1024).max(20_000_000).default(10_000_000),
+  APPOINTMENT_CONFIRMATION_MINUTES: z.coerce.number().int().min(5).max(10080).default(1440),
+  APPOINTMENT_CANCELLATION_CUTOFF_MINUTES: z.coerce.number().int().min(0).max(10080).default(120),
+  APPOINTMENT_NO_SHOW_GRACE_MINUTES: z.coerce.number().int().min(0).max(1440).default(15),
+  APPOINTMENT_AUTO_CONFIRM: z.enum(['true','false']).default('false').transform(value=>value==='true'),
 });
 
 const parsed = environmentSchema.safeParse(process.env);
