@@ -1,7 +1,8 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { AppShell, Toasts } from './components';
 import { StoreProvider, useStore } from './store';
-import { AuthPage, InfoPage, Landing, PublicDoctorProfile, PublicDoctors } from './public-pages';
+import { AuthPage, InfoPage, Landing } from './public-pages';
+import { PublicDoctorProfile, PublicDoctors } from './discovery-pages';
 import { AppointmentDetail, Appointments, Booking, DoctorSearch, DocumentDetail, Documents, History, Messages, Notifications, PatientDoctorProfile, PatientOverview, Settings } from './patient-pages';
 import { AdminAudit, AdminOverview, AdminReports, AdminTable, Availability, DoctorCalendar, DoctorMessages, DoctorOverview, PatientWorkspace } from './role-pages';
 import { DoctorIntakes, IntakeAssistant } from './assistant';

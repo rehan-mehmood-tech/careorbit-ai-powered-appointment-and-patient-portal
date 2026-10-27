@@ -7,6 +7,7 @@ import { validate } from './validation.js';
 import type { Pool } from 'pg';
 import { createAuthRouter } from './auth/routes.js';
 import { createProfileRouter } from './profiles/routes.js';
+import { createDiscoveryRouter } from './discovery/routes.js';
 
 const paginationSchema = z.object({
   body: z.unknown(), params: z.object({}),
@@ -20,6 +21,7 @@ export function createApiRouter(pool: Pool, defaultPolicy: RatePolicy, authPolic
   const v1 = Router();
   v1.use(createRateLimit(defaultPolicy, 'api-default'));
   v1.use(createAuthRouter(pool));
+  v1.use(createDiscoveryRouter(pool));
   v1.use(createProfileRouter(pool));
   v1.get('/', (_request, response) => sendSuccess(response, { name: 'CareOrbit API', version: 'v1' }));
   v1.get('/meta/pagination', validate(paginationSchema), (_request, response) => {

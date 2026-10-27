@@ -6,8 +6,8 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 
 - Total phases: **25** (Phase 0 through Phase 24)
 - Completed phases: **4 / 25**
-- Completed trackable checkboxes: **108 / 346**
-- Current active phase: **Phase 5 — Complete; Phase 6 is next in sequence**
+- Completed trackable checkboxes: **118 / 346**
+- Current active phase: **Phase 6 — R1 scope complete; R2 assistant clarification intentionally deferred**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -228,23 +228,23 @@ Objective: deliver real, paginated, privacy-safe discovery using reservable avai
 
 - [x] Public landing, directory, profile, and patient search route components exist.
 - [x] Doctor cards visually include verification, specialty, experience, language, location, fee, and next-slot fields.
-- [ ] Implement `GET /api/doctors`, `/:id`, `/:id/slots`, and `/api/specialties` against PostgreSQL.
-- [ ] Support combined specialty, location, exact availability date, fee, experience, and language filters.
-- [ ] Support sorting by earliest reservable availability, fee, and experience.
-- [ ] Add active-filter chips, clear-all, URL state, server pagination, loading skeletons, error state, no-results recovery, and mobile filter drawer.
-- [ ] Derive availability filters and next-slot values from the scheduling engine, not static opening hours.
-- [ ] Show qualifications, clinic details, modes, policy, currency, and timezone-labeled availability on profiles.
-- [ ] Exclude unverified/suspended/inactive doctors and all private provider attributes.
+- [x] Implement `GET /api/doctors`, `/:id`, `/:id/slots`, and `/api/specialties` against PostgreSQL.
+- [x] Support combined specialty, location, exact availability date, fee, experience, and language filters.
+- [x] Support sorting by earliest reservable availability, fee, and experience.
+- [x] Add active-filter chips, clear-all, URL state, server pagination, loading skeletons, error state, no-results recovery, and mobile filter drawer.
+- [x] Derive availability filters and next-slot values from the scheduling engine, not static opening hours.
+- [x] Show qualifications, clinic details, modes, policy, currency, and timezone-labeled availability on profiles.
+- [x] Exclude unverified/suspended/inactive doctors and all private provider attributes.
 - [ ] Implement AI-assistant clarification for ambiguous date/location only in the R2 assistant phase.
 
 ### Security requirements
 
-- [ ] Apply field allowlists, bounded pagination, validation, and public rate limits.
+- [x] Apply field allowlists, bounded pagination, validation, and public rate limits.
 
 ### Acceptance gate
 
-- [ ] “Cardiologists available this Saturday” resolves to the exact patient-timezone date and only returns genuinely reservable slots.
-- [ ] Search/filter/sort/pagination combinations pass correctness and performance tests.
+- [x] “Cardiologists available this Saturday” resolves to the exact patient-timezone date and only returns genuinely reservable slots.
+- [x] Search/filter/sort/pagination combinations pass correctness and performance tests.
 
 ---
 
