@@ -26,7 +26,7 @@ export function privacySafeClientKey(value: string): string {
 }
 
 function sanitizeRoute(route: string): string {
-  return route
-    .replace(/[0-9a-f]{8}-[0-9a-f-]{27,}/gi, ':id')
-    .replace(/\/[A-Za-z0-9_-]{20,}(?=\/|$)/g, '/:id');
+  return route.split('/').map(segment =>
+    /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(segment) || /^\d{6,}$/.test(segment) || (segment.length >= 24 && /\d/.test(segment)) ? ':id' : segment,
+  ).join('/');
 }

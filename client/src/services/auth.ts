@@ -12,7 +12,7 @@ function user(value:ApiUser):User{return{id:value.id,name:value.name,email:value
 function cookie(name:string):string{return document.cookie.split('; ').find(item=>item.startsWith(`${name}=`))?.split('=').slice(1).join('=')??''}
 
 async function raw<T>(path:string,init:RequestInit={}):Promise<T>{
- const headers=new Headers(init.headers);if(init.body&&!headers.has('content-type'))headers.set('content-type','application/json');
+ const headers=new Headers(init.headers);if(typeof init.body==='string'&&!headers.has('content-type'))headers.set('content-type','application/json');
  if(accessToken)headers.set('authorization',`Bearer ${accessToken}`);
  if(!['GET','HEAD'].includes((init.method||'GET').toUpperCase())){const csrf=cookie('careorbit_csrf');if(csrf)headers.set('x-csrf-token',decodeURIComponent(csrf));}
  const response=await fetch(`${apiBase}/api/v1${path}`,{...init,headers,credentials:'include'});

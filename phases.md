@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **3 / 25**
-- Completed trackable checkboxes: **95 / 346**
-- Current active phase: **Phase 4 — Complete; Phase 5 is next in sequence**
+- Completed phases: **4 / 25**
+- Completed trackable checkboxes: **108 / 346**
+- Current active phase: **Phase 5 — Complete; Phase 6 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -198,25 +198,25 @@ Objective: implement the role data and controlled provider-verification journey.
 
 ### Implementation tasks
 
-- [ ] Implement `GET/PATCH /api/me` with patient contact, DOB, timezone, optional demographics, allergies/history, and preferences.
-- [ ] Separate doctor public profile fields from private account and verification fields.
-- [ ] Implement doctor specialty, qualifications, experience, languages, registration/license, biography, photo, modes, clinic, fee, and currency editing.
-- [ ] Implement protected verification-artifact upload and pending/rejected/resubmission states.
-- [ ] Implement admin application review with approve/reject reason, reviewer, timestamp, and immutable audit event.
-- [ ] Ensure only verified, active doctors can appear in discovery, accept booking, or enter clinical workspace.
-- [ ] Implement admin specialty and clinic metadata CRUD with safe deactivation behavior.
-- [ ] Implement account suspension/reactivation with reason and audit context.
-- [ ] Wire existing profile, verification, and admin-management screens to real APIs.
+- [x] Implement `GET/PATCH /api/me` with patient contact, DOB, timezone, optional demographics, allergies/history, and preferences.
+- [x] Separate doctor public profile fields from private account and verification fields.
+- [x] Implement doctor specialty, qualifications, experience, languages, registration/license, biography, photo, modes, clinic, fee, and currency editing.
+- [x] Implement protected verification-artifact upload and pending/rejected/resubmission states.
+- [x] Implement admin application review with approve/reject reason, reviewer, timestamp, and immutable audit event.
+- [x] Ensure only verified, active doctors can appear in discovery, accept booking, or enter clinical workspace.
+- [x] Implement admin specialty and clinic metadata CRUD with safe deactivation behavior.
+- [x] Implement account suspension/reactivation with reason and audit context.
+- [x] Wire existing profile, verification, and admin-management screens to real APIs.
 
 ### Security requirements
 
-- [ ] Prevent doctors from modifying verification/status fields and admins from routinely reading patient medical profile fields.
-- [ ] Serve verification artifacts only through short-lived, authorized access.
+- [x] Prevent doctors from modifying verification/status fields and admins from routinely reading patient medical profile fields.
+- [x] Serve verification artifacts only through short-lived, authorized access.
 
 ### Acceptance gate
 
-- [ ] An applicant cannot self-verify; every status change records actor/reason/time.
-- [ ] Suspended/unverified doctors are absent from discovery and denied clinical actions.
+- [x] An applicant cannot self-verify; every status change records actor/reason/time.
+- [x] Suspended/unverified doctors are absent from discovery and denied clinical actions.
 
 ---
 

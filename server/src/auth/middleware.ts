@@ -11,15 +11,15 @@ export function authenticate(pool: Pool): RequestHandler {
       if (!raw) throw apiErrors.unauthenticated();
       const claims = await verifyAccessToken(raw);
       const result = await pool.query(
-        `SELECT u.status, u.role, u.email_verified_at, s.revoked_at, s.expires_at
-         FROM users u JOIN sessions s ON s.user_id=u.id WHERE u.id=$1 AND s.id=$2`,
+        `SELECT u.status, u.role, u.email_verified_at, s.revoked_at, s.expires_at, dp.verification_status
+         FROM users u JOIN sessions s ON s.user_id=u.id LEFT JOIN doctor_profiles dp ON dp.user_id=u.id WHERE u.id=$1 AND s.id=$2`,
         [claims.sub, claims.sessionId],
       );
       const row = result.rows[0];
       if (!row || row.revoked_at || new Date(row.expires_at) <= new Date()) throw apiErrors.unauthenticated();
       if (row.status === 'suspended' || row.status === 'closed') throw new AppError(403, 'ACCOUNT_UNAVAILABLE', 'This account cannot perform this action');
       if (row.role !== claims.role) throw apiErrors.unauthenticated();
-      request.auth = { userId: claims.sub, sessionId: claims.sessionId, role: claims.role, emailVerified: Boolean(row.email_verified_at), status: row.status };
+      request.auth = { userId: claims.sub, sessionId: claims.sessionId, role: claims.role, emailVerified: Boolean(row.email_verified_at), status: row.status, doctorVerificationStatus: row.verification_status };
       next();
     } catch (error) { next(error instanceof AppError ? error : apiErrors.unauthenticated()); }
   };
@@ -32,7 +32,7 @@ export function requireRoles(...roles: Role[]): RequestHandler {
 export const requireClinicalAccess: RequestHandler = (request, _response, next) => {
   if (!request.auth) return next(apiErrors.unauthenticated());
   if (!request.auth.emailVerified) return next(new AppError(403, 'EMAIL_VERIFICATION_REQUIRED', 'Verify your email before accessing clinical actions'));
-  if (request.auth.role === 'doctor' && request.auth.status !== 'active') return next(new AppError(403, 'DOCTOR_NOT_VERIFIED', 'Doctor verification is required'));
+  if (request.auth.role === 'doctor' && (request.auth.status !== 'active' || request.auth.doctorVerificationStatus !== 'approved')) return next(new AppError(403, 'DOCTOR_NOT_VERIFIED', 'Doctor verification is required'));
   next();
 };
 

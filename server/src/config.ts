@@ -26,6 +26,8 @@ const environmentSchema = z.object({
   BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(14).default(12),
   AUTH_TOKEN_TTL_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
   COOKIE_DOMAIN: z.string().optional(),
+  PRIVATE_UPLOAD_DIR: z.string().min(1).default('../.runtime/verification-artifacts'),
+  VERIFICATION_MAX_FILE_BYTES: z.coerce.number().int().min(1024).max(20_000_000).default(10_000_000),
 });
 
 const parsed = environmentSchema.safeParse(process.env);

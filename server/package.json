@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/app.test.js",
-    "test:auth": "npm run build && node --test dist/auth/auth.test.js"
+    "test:auth": "npm run build && node --test dist/auth/auth.test.js",
+    "test:profiles": "npm run build && node --test dist/profiles/profiles.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -21,6 +22,7 @@
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.1.0",
     "jose": "^6.2.13",
+    "multer": "^2.5.0",
     "pg": "^8.16.3",
     "zod": "^4.6.6"
   },
@@ -30,6 +32,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/multer": "^2.3.0",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "@types/supertest": "^7.2.1",
