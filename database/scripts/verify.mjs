@@ -101,6 +101,13 @@ try {
      VALUES ('unsafe.test', 'test', '{"message_body":"must not be logged"}'::jsonb)`,
   ), 'clinical/chat body exclusion from audit metadata');
 
+  await expectDatabaseError('23514', () => client.query(
+    `INSERT INTO api_idempotency_records
+       (idempotency_key, method, request_path, request_hash, response_status, response_body, completed_at, expires_at)
+     VALUES ('verify-unsafe-response', 'POST', '/api/v1/messages', repeat('a', 64), 201,
+       '{"data":{"message_body":"must not be retained"}}'::jsonb, now(), now() + interval '1 hour')`,
+  ), 'clinical/chat body exclusion from idempotency records');
+
   const expectedIndexes = [
     'appointments_doctor_time_status_idx', 'appointments_patient_time_status_idx', 'messages_cursor_idx',
     'durable_jobs_due_idx', 'document_grants_doctor_idx', 'doctor_profiles_discovery_idx',

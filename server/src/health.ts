@@ -9,7 +9,7 @@ async function timedCheck(action: () => Promise<void>): Promise<HealthCheck> {
     await action();
     return { status: 'up', latencyMs: Math.round(performance.now() - started) };
   } catch (error) {
-    return { status: 'down', latencyMs: Math.round(performance.now() - started), detail: error instanceof Error ? error.message : 'Unavailable' };
+    return { status: 'down', latencyMs: Math.round(performance.now() - started), detail: 'Unavailable' };
   }
 }
 

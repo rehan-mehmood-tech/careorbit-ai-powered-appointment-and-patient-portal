@@ -13,6 +13,11 @@ const environmentSchema = z.object({
   INTERNAL_SERVICE_TOKEN: z.string().min(32),
   REQUEST_BODY_LIMIT: z.string().regex(/^\d+(kb|mb)$/i).default('1mb'),
   SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).default(10000),
+  TRUST_PROXY: z.coerce.number().int().min(0).max(2).default(0),
+  REQUIRE_TLS: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().min(1000).default(60000),
+  RATE_LIMIT_DEFAULT_MAX: z.coerce.number().int().min(1).default(120),
+  RATE_LIMIT_AUTH_MAX: z.coerce.number().int().min(1).default(10),
 });
 
 const parsed = environmentSchema.safeParse(process.env);

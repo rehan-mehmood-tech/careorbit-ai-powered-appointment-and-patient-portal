@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **1 / 25**
-- Completed trackable checkboxes: **66 / 346**
-- Current active phase: **Phase 2 — Complete; Phase 3 is next in sequence**
+- Completed phases: **2 / 25**
+- Completed trackable checkboxes: **79 / 346**
+- Current active phase: **Phase 3 — Complete; Phase 4 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -139,25 +139,25 @@ Objective: establish the trusted API boundary described in Sections 10 and 11.
 
 ### Implementation tasks
 
-- [ ] Implement Express TypeScript app composition, versioned `/api` routing, graceful shutdown, and request-size limits.
-- [ ] Implement consistent success/error envelopes, request IDs, machine-readable error codes, and pagination metadata.
-- [ ] Add centralized validation, error handling, privacy-preserving 404 behavior, and production-safe logging.
-- [ ] Map validation to 422, conflict to 409, unauthenticated to 401, forbidden/private-not-found to 403/404, oversized upload to 413, and throttling to 429.
-- [ ] Add OpenAPI documentation for all R1 REST contracts.
-- [ ] Add database transaction helpers and idempotency middleware.
-- [ ] Add safe CORS, Helmet/security headers, compression, and proxy/TLS configuration.
-- [ ] Add service-to-service authentication for Express-to-FastAPI calls.
-- [ ] Add per-route rate-limit policies and abuse telemetry.
+- [x] Implement Express TypeScript app composition, versioned `/api` routing, graceful shutdown, and request-size limits.
+- [x] Implement consistent success/error envelopes, request IDs, machine-readable error codes, and pagination metadata.
+- [x] Add centralized validation, error handling, privacy-preserving 404 behavior, and production-safe logging.
+- [x] Map validation to 422, conflict to 409, unauthenticated to 401, forbidden/private-not-found to 403/404, oversized upload to 413, and throttling to 429.
+- [x] Add OpenAPI documentation for all R1 REST contracts.
+- [x] Add database transaction helpers and idempotency middleware.
+- [x] Add safe CORS, Helmet/security headers, compression, and proxy/TLS configuration.
+- [x] Add service-to-service authentication for Express-to-FastAPI calls.
+- [x] Add per-route rate-limit policies and abuse telemetry.
 
 ### Security requirements
 
-- [ ] Never return stack traces, password/session hashes, private object keys, or provider secrets.
-- [ ] Parameterize all SQL and encode untrusted output safely.
-- [ ] Redact tokens, identifiers, document bodies, chat bodies, and medical content from routine logs.
+- [x] Never return stack traces, password/session hashes, private object keys, or provider secrets.
+- [x] Parameterize all SQL and encode untrusted output safely.
+- [x] Redact tokens, identifiers, document bodies, chat bodies, and medical content from routine logs.
 
 ### Acceptance gate
 
-- [ ] Contract tests cover error envelopes, validation, pagination, request IDs, rate limits, and graceful dependency failure.
+- [x] Contract tests cover error envelopes, validation, pagination, request IDs, rate limits, and graceful dependency failure.
 
 ---
 
