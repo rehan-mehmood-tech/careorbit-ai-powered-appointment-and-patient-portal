@@ -1,3 +1,7 @@
+import json
+import logging
+import os
+from pathlib import Path
 from typing import Annotated, Literal
 
 import firebase_admin
@@ -6,21 +10,58 @@ from firebase_admin import auth, credentials, firestore
 
 from .config import get_settings
 
+logger = logging.getLogger(__name__)
 
-def initialize_firebase() -> None:
+
+def initialize_firebase() -> bool:
     if firebase_admin._apps:
-        return
+        return True
+
     settings = get_settings()
-    credential = (
-        credentials.Certificate(settings.google_application_credentials)
-        if settings.google_application_credentials
-        else credentials.ApplicationDefault()
-    )
-    firebase_admin.initialize_app(credential, {"projectId": settings.firebase_project_id})
+    try:
+        if settings.firebase_credentials_json:
+            service_account = json.loads(settings.firebase_credentials_json)
+            if not isinstance(service_account, dict):
+                raise ValueError("Firebase credential JSON must be an object")
+            credential = credentials.Certificate(service_account)
+        elif settings.google_application_credentials:
+            credential_path = Path(
+                os.path.expandvars(settings.google_application_credentials)
+            ).expanduser()
+            if not credential_path.is_file():
+                logger.warning(
+                    "Firebase credential file is unavailable; Firebase features are disabled"
+                )
+                return False
+            credential = credentials.Certificate(str(credential_path))
+        else:
+            logger.warning(
+                "Firebase credentials are not configured; Firebase features are disabled"
+            )
+            return False
+
+        firebase_admin.initialize_app(
+            credential,
+            {"projectId": settings.firebase_project_id},
+        )
+        return True
+    except (FileNotFoundError, json.JSONDecodeError, ValueError, OSError) as exc:
+        logger.warning(
+            "Firebase credentials are invalid; Firebase features are disabled (%s)",
+            type(exc).__name__,
+        )
+        return False
+    except Exception as exc:
+        logger.warning(
+            "Firebase initialization failed; Firebase features are disabled (%s)",
+            type(exc).__name__,
+        )
+        return False
 
 
 def database():
-    initialize_firebase()
+    if not initialize_firebase():
+        raise RuntimeError("Firebase is unavailable")
     return firestore.client()
 
 

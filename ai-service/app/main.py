@@ -17,7 +17,7 @@ from .schemas import ConfirmRequest, IntakeMessageRequest, IntakeMessageResponse
 settings=get_settings(); limiter=Limiter(key_func=get_remote_address,default_limits=["120/minute"])
 @asynccontextmanager
 async def lifespan(app:FastAPI):
-    initialize_firebase(); path=Path(settings.checkpoint_db); path.parent.mkdir(parents=True,exist_ok=True)
+    app.state.firebase_ready=initialize_firebase(); path=Path(settings.checkpoint_db); path.parent.mkdir(parents=True,exist_ok=True)
     async with AsyncSqliteSaver.from_conn_string(str(path)) as saver: app.state.graph=build_graph(saver); yield
 app=FastAPI(title="CareOrbit AI Intake API",version="1.0.0",lifespan=lifespan)
 app.state.limiter=limiter; app.add_middleware(SlowAPIMiddleware)
@@ -30,7 +30,7 @@ async def health(): return {"status":"ok","synthetic_data_only":True}
 async def health_live(): return {"status":"ok","service":"careorbit-ai-service"}
 @app.get("/health/ready")
 async def health_ready(request:Request):
-    checks={"firebase":bool(firebase_admin._apps),"graph":hasattr(request.app.state,"graph"),"groq":bool(settings.groq_api_key)}
+    checks={"firebase":bool(getattr(request.app.state,"firebase_ready",False) and firebase_admin._apps),"graph":hasattr(request.app.state,"graph"),"groq":bool(settings.groq_api_key)}
     if not all(checks.values()): raise HTTPException(503,detail={"status":"not_ready","checks":checks})
     return {"status":"ready","service":"careorbit-ai-service","checks":checks}
 @app.post("/api/intakes/message",response_model=IntakeMessageResponse)
