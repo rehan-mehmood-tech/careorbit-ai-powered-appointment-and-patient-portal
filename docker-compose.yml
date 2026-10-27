@@ -50,6 +50,24 @@ services:
       retries: 10
     restart: unless-stopped
 
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-careorbit}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-careorbit-local-secret}
+      S3_BUCKET: ${S3_BUCKET:-careorbit-local}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}" &&
+        mc mb --ignore-existing "local/$${S3_BUCKET}" &&
+        mc anonymous set none "local/$${S3_BUCKET}" &&
+        mc version enable "local/$${S3_BUCKET}"
+    restart: "no"
+
 volumes:
   careorbit_postgres_data:
   careorbit_redis_data:

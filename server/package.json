@@ -14,9 +14,12 @@
     "test:discovery": "npm run build && node --test dist/discovery/discovery.test.js",
     "test:scheduling": "npm run build && node --test dist/scheduling/scheduling.test.js",
     "test:appointments": "npm run build && node --test dist/appointments/appointments.test.js",
-    "test:patient": "npm run build && node --test dist/patient/patient.test.js"
+    "test:patient": "npm run build && node --test dist/patient/patient.test.js",
+    "test:documents": "npm run build && node --test dist/documents/documents.test.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1157.0",
+    "@aws-sdk/s3-request-presigner": "^3.1157.0",
     "bcrypt": "^6.0.0",
     "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",

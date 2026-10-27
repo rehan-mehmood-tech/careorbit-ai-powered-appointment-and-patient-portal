@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **7 / 25**
-- Completed trackable checkboxes: **154 / 346**
-- Current active phase: **Phase 9 — Implementation complete; acceptance verification remains**
+- Completed phases: **8 / 25**
+- Completed trackable checkboxes: **166 / 346**
+- Current active phase: **Phase 10 — Complete; Phase 9 browser acceptance remains open**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -340,24 +340,24 @@ Objective: deliver private uploads, protected reads, and purpose-bound sharing.
 
 - [x] UI advertises PDF/JPG/PNG and 20 MB limits and performs preliminary browser validation.
 - [x] Sharing and AI-consent controls are visually separated in the document UI.
-- [ ] Select/configure private S3-compatible storage with non-guessable object keys and encryption at rest.
-- [ ] Implement server-authorized multipart/presigned upload initiation and completion.
-- [ ] Enforce 20 MB, PDF/JPEG/PNG extension, MIME, magic signature, polyglot/executable, encryption, readability, and 50-page checks server-side.
-- [ ] Sanitize display filenames and keep storage keys private.
-- [ ] Quarantine uploads, run malware scanning, and promote only approved files.
-- [ ] Implement upload progress, cancellation, retry, scan/extraction states, rename/type/date, appointment association, and retention-aware delete status.
-- [ ] Implement protected preview/download through short-lived signed URLs issued after each authorization check.
-- [ ] Implement grants with patient, doctor, resource scope, purpose, expiry, consent, and revocation timestamp.
-- [ ] Block new reads/signed links immediately after revocation and explain already-downloaded-copy limitations.
-- [ ] Route chat attachments through the same pipeline without automatic AI processing.
+- [x] Select/configure private S3-compatible storage with non-guessable object keys and encryption at rest.
+- [x] Implement server-authorized multipart/presigned upload initiation and completion.
+- [x] Enforce 20 MB, PDF/JPEG/PNG extension, MIME, magic signature, polyglot/executable, encryption, readability, and 50-page checks server-side.
+- [x] Sanitize display filenames and keep storage keys private.
+- [x] Quarantine uploads, run malware scanning, and promote only approved files.
+- [x] Implement upload progress, cancellation, retry, scan/extraction states, rename/type/date, appointment association, and retention-aware delete status.
+- [x] Implement protected preview/download through short-lived signed URLs issued after each authorization check.
+- [x] Implement grants with patient, doctor, resource scope, purpose, expiry, consent, and revocation timestamp.
+- [x] Block new reads/signed links immediately after revocation and explain already-downloaded-copy limitations.
+- [x] Route chat attachments through the same pipeline without automatic AI processing.
 
 ### Security requirements
 
-- [ ] Prevent IDOR, public bucket access, object-key disclosure, stale URL reuse, and cross-doctor grant leakage.
+- [x] Prevent IDOR, public bucket access, object-key disclosure, stale URL reuse, and cross-doctor grant leakage.
 
 ### Acceptance gate
 
-- [ ] Tests cover arbitrary IDs, expired links, revoked grants, MIME mismatch, malware, oversized/encrypted/unreadable PDFs, and processing failure without original loss.
+- [x] Tests cover arbitrary IDs, expired links, revoked grants, MIME mismatch, malware, oversized/encrypted/unreadable PDFs, and processing failure without original loss.
 
 ---
 
