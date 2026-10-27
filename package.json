@@ -1,33 +1,31 @@
 {
   "name": "careorbit",
-  "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "private": true,
+  "workspaces": ["client", "server", "worker"],
   "scripts": {
-    "dev": "node ./node_modules/vite/bin/vite.js",
-    "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build",
-    "preview": "node ./node_modules/vite/bin/vite.js preview",
-    "typecheck": "node ./node_modules/typescript/bin/tsc -b",
-    "test": "node ./node_modules/vitest/vitest.mjs run"
-  },
-  "dependencies": {
-    "@phosphor-icons/react": "^2.1.10",
-    "firebase": "^13.0.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.4",
-    "recharts": "^3.2.1",
-    "zod": "^4.1.12"
+    "install:all": "npm ci && npm run ai:install",
+    "ai:install": "node scripts/ai-service.mjs install",
+    "dev": "concurrently --kill-others-on-fail --names client,server,ai,worker --prefix-colors cyan,green,magenta,yellow \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:ai\" \"npm run dev:worker\"",
+    "dev:client": "npm run dev --workspace @careorbit/client",
+    "dev:server": "npm run dev --workspace @careorbit/server",
+    "dev:ai": "node scripts/ai-service.mjs dev",
+    "dev:worker": "npm run dev --workspace @careorbit/worker",
+    "build": "npm run build --workspaces --if-present && npm run build:ai",
+    "build:client": "npm run build --workspace @careorbit/client",
+    "build:server": "npm run build --workspace @careorbit/server",
+    "build:worker": "npm run build --workspace @careorbit/worker",
+    "build:ai": "node scripts/ai-service.mjs check",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/react": "^19.1.16",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.4",
-    "jsdom": "^27.0.1",
-    "typescript": "~5.9.3",
-    "vite": "^7.1.9",
-    "vitest": "^3.2.4"
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=22.12 <25"
   }
 }

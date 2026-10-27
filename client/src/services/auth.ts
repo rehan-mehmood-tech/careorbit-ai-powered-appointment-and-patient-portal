@@ -21,10 +21,10 @@ async function readUser(firebaseUser:FirebaseUser):Promise<User>{
  let snapshot;
  try{snapshot=await getDoc(doc(db,'users',firebaseUser.uid))}catch(error){
   const fallback=firebaseUser.email?DEMO_PROFILES[firebaseUser.email.toLowerCase()]:undefined;
-  if(fallback)return{id:firebaseUser.uid,name:fallback.displayName,email:firebaseUser.email,role:fallback.role,avatar:initials(fallback.displayName)};
+   if(fallback)return{id:firebaseUser.uid,name:fallback.displayName,email:firebaseUser.email??'',role:fallback.role,avatar:initials(fallback.displayName)};
   throw error
  }
- if(!snapshot.exists()){const fallback=firebaseUser.email?DEMO_PROFILES[firebaseUser.email.toLowerCase()]:undefined;if(fallback)return{id:firebaseUser.uid,name:fallback.displayName,email:firebaseUser.email,role:fallback.role,avatar:initials(fallback.displayName)};throw new Error('Your Firebase Authentication user exists, but its CareOrbit profile is missing. Sign in with the matching portal or contact support.')}
+ if(!snapshot.exists()){const fallback=firebaseUser.email?DEMO_PROFILES[firebaseUser.email.toLowerCase()]:undefined;if(fallback)return{id:firebaseUser.uid,name:fallback.displayName,email:firebaseUser.email??'',role:fallback.role,avatar:initials(fallback.displayName)};throw new Error('Your Firebase Authentication user exists, but its CareOrbit profile is missing. Sign in with the matching portal or contact support.')}
  const record=snapshot.data() as UserRecord;
  if(record.status==='suspended')throw new Error('This account is suspended. Contact CareOrbit support.');
  if(!['patient','doctor','admin'].includes(record.role))throw new Error('This account has an invalid CareOrbit role.');

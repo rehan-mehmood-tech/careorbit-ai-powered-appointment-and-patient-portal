@@ -1,4 +1,5 @@
 import hashlib
+import firebase_admin
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
@@ -25,6 +26,13 @@ def require_role(user,role):
     if user.role!=role: raise HTTPException(403,f"{role.title()} access required")
 @app.get("/health")
 async def health(): return {"status":"ok","synthetic_data_only":True}
+@app.get("/health/live")
+async def health_live(): return {"status":"ok","service":"careorbit-ai-service"}
+@app.get("/health/ready")
+async def health_ready(request:Request):
+    checks={"firebase":bool(firebase_admin._apps),"graph":hasattr(request.app.state,"graph"),"groq":bool(settings.groq_api_key)}
+    if not all(checks.values()): raise HTTPException(503,detail={"status":"not_ready","checks":checks})
+    return {"status":"ready","service":"careorbit-ai-service","checks":checks}
 @app.post("/api/intakes/message",response_model=IntakeMessageResponse)
 @limiter.limit("20/minute")
 async def intake_message(request:Request,body:IntakeMessageRequest,user:CurrentUserDep):

@@ -1,5 +1,40 @@
 # CareOrbit
 
+CareOrbit is organized as a Phase 1 multi-service workspace:
+
+- `client/` — React/Vite application (`http://127.0.0.1:3000`)
+- `server/` — Express/TypeScript API (`http://127.0.0.1:3001`)
+- `ai-service/` — FastAPI AI service (`http://127.0.0.1:8000`)
+- `worker/` — persistent worker scaffold and health server (`http://127.0.0.1:3002`)
+- `database/` — migrations begin in Phase 2; none exist yet
+- `docs/decisions/` — architecture decision records
+
+## Phase 1 local startup
+
+Prerequisites: Node 22.12+, Python 3.11–3.13, Docker Desktop with Compose, and configured local environment files.
+
+```powershell
+npm.cmd run install:all
+npm.cmd run infra:up
+npm.cmd run dev
+```
+
+Build every workspace and syntax-check the AI service:
+
+```powershell
+npm.cmd run build
+```
+
+Health endpoints:
+
+- Express: `/health/live`, `/health/ready`
+- FastAPI: `/health/live`, `/health/ready`
+- Worker: `/health/live`, `/health/ready`
+
+Express readiness is intentionally `503` until PostgreSQL and FastAPI are ready. Phase 1 creates infrastructure only; PostgreSQL schemas and migrations are Phase 2 work.
+
+## Prototype status
+
 A responsive, role-aware healthcare appointment and patient portal built from the supplied PRD. The web client is connected to Firebase Authentication, Firestore, Storage, and Analytics. Clinical collections start empty and are populated only by real application activity; no patient, provider, appointment, document, or message records are preloaded.
 
 ## What works now
