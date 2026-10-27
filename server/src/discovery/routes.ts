@@ -22,7 +22,7 @@ const slotSchema=z.object({body:z.unknown(),params:z.object({id:uuid}),query:z.o
 
 // Generates only slots that satisfy rules, notice/horizon, exceptions, and existing occupied intervals.
 const slotCte = (rangeStart:string,rangeEnd=rangeStart) => `
-  candidate_slots AS (
+  recurring_slots AS (
     SELECT dp.user_id doctor_id, dc.id doctor_clinic_id, dc.consultation_mode mode, dc.fee_minor, dc.currency,
       c.id clinic_id,c.name clinic_name,c.address_line1,c.city,c.country_code,c.timezone clinic_timezone,
       ar.timezone rule_timezone, ar.appointment_minutes, ar.buffer_before_minutes, ar.buffer_after_minutes,
@@ -42,7 +42,23 @@ const slotCte = (rangeStart:string,rangeEnd=rangeStart) => `
         AND ae.exception_type IN ('unavailable','break','leave') AND tstzrange(ae.starts_at,ae.ends_at,'[)') && tstzrange(gs,gs+ar.appointment_minutes*interval '1 minute','[)'))
       AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.doctor_id=dp.user_id AND a.status IN ('scheduled','confirmed')
         AND a.occupied_at && tstzrange(gs-ar.buffer_before_minutes*interval '1 minute',gs+(ar.appointment_minutes+ar.buffer_after_minutes)*interval '1 minute','[)'))
-  )`;
+      AND NOT EXISTS (SELECT 1 FROM appointment_slot_holds h WHERE h.doctor_id=dp.user_id AND h.expires_at>now()
+        AND h.doctor_interval && tstzrange(gs-ar.buffer_before_minutes*interval '1 minute',gs+(ar.appointment_minutes+ar.buffer_after_minutes)*interval '1 minute','[)'))
+  ), override_slots AS (
+    SELECT dp.user_id doctor_id,dc.id doctor_clinic_id,dc.consultation_mode mode,dc.fee_minor,dc.currency,
+      c.id clinic_id,c.name clinic_name,c.address_line1,c.city,c.country_code,c.timezone clinic_timezone,
+      ae.timezone rule_timezone,COALESCE(cfg.appointment_minutes,30) appointment_minutes,COALESCE(cfg.buffer_before_minutes,0) buffer_before_minutes,COALESCE(cfg.buffer_after_minutes,0) buffer_after_minutes,
+      gs starts_at,gs+COALESCE(cfg.appointment_minutes,30)*interval '1 minute' ends_at
+    FROM availability_exceptions ae JOIN doctor_profiles dp ON dp.user_id=ae.doctor_id AND dp.verification_status='approved'
+    JOIN users u ON u.id=dp.user_id AND u.status='active' JOIN doctor_clinics dc ON dc.id=ae.doctor_clinic_id AND dc.active JOIN clinics c ON c.id=dc.clinic_id AND c.active
+    LEFT JOIN LATERAL (SELECT appointment_minutes,buffer_before_minutes,buffer_after_minutes,minimum_notice_minutes FROM availability_rules WHERE doctor_clinic_id=dc.id AND active ORDER BY updated_at DESC LIMIT 1) cfg ON true
+    JOIN LATERAL generate_series(ae.starts_at,ae.ends_at-COALESCE(cfg.appointment_minutes,30)*interval '1 minute',COALESCE(cfg.appointment_minutes,30)*interval '1 minute') gs ON true
+    WHERE ae.exception_type='available_override' AND gs>=now()+COALESCE(cfg.minimum_notice_minutes,0)*interval '1 minute'
+      AND (gs AT TIME ZONE ae.timezone)::date BETWEEN (${rangeStart})::date AND (${rangeEnd})::date
+      AND NOT EXISTS(SELECT 1 FROM availability_exceptions block WHERE block.doctor_id=ae.doctor_id AND block.id<>ae.id AND block.exception_type IN('break','leave','unavailable') AND tstzrange(block.starts_at,block.ends_at,'[)')&&tstzrange(gs,gs+COALESCE(cfg.appointment_minutes,30)*interval '1 minute','[)'))
+      AND NOT EXISTS(SELECT 1 FROM appointments a WHERE a.doctor_id=ae.doctor_id AND a.status IN('scheduled','confirmed') AND a.occupied_at&&tstzrange(gs-COALESCE(cfg.buffer_before_minutes,0)*interval '1 minute',gs+(COALESCE(cfg.appointment_minutes,30)+COALESCE(cfg.buffer_after_minutes,0))*interval '1 minute','[)'))
+      AND NOT EXISTS(SELECT 1 FROM appointment_slot_holds h WHERE h.doctor_id=ae.doctor_id AND h.expires_at>now() AND h.doctor_interval&&tstzrange(gs-COALESCE(cfg.buffer_before_minutes,0)*interval '1 minute',gs+(COALESCE(cfg.appointment_minutes,30)+COALESCE(cfg.buffer_after_minutes,0))*interval '1 minute','[)'))
+  ), candidate_slots AS (SELECT * FROM recurring_slots UNION ALL SELECT * FROM override_slots)`;
 
 const publicFields=`dp.user_id id,dp.display_name name,dp.biography bio,dp.qualifications,dp.years_experience experience,dp.public_photo_url photo_url,
   COALESCE((SELECT jsonb_agg(jsonb_build_object('id',s.id,'slug',s.slug,'name',s.name,'primary',ds.is_primary) ORDER BY ds.is_primary DESC,s.name) FROM doctor_specialties ds JOIN specialties s ON s.id=ds.specialty_id AND s.active WHERE ds.doctor_id=dp.user_id),'[]') specialties,

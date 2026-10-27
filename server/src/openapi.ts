@@ -3,7 +3,7 @@ const r1Contracts: Record<string, string[]> = {
   '/me': ['get', 'patch'], '/me/password': ['patch'], '/me/sessions': ['get'], '/me/sessions/{id}': ['delete'], '/me/notification-preferences': ['get', 'patch'],
   '/doctors': ['get'], '/doctors/{id}': ['get'], '/doctors/{id}/slots': ['get'], '/specialties': ['get'],
   '/appointments': ['get', 'post'], '/appointments/{id}': ['get'], '/appointments/{id}/cancel': ['post'], '/appointments/{id}/reschedule': ['post'], '/appointments/{id}/confirm': ['post'], '/appointments/{id}/decline': ['post'], '/appointments/{id}/complete': ['post'], '/appointments/{id}/no-show': ['post'], '/appointments/{id}/encounter': ['get'],
-  '/doctor/dashboard': ['get'], '/doctor/profile': ['get', 'patch'], '/doctor/availability': ['get', 'post'], '/doctor/availability/{id}': ['patch', 'delete'], '/doctor/availability/exceptions': ['post'],
+  '/doctor/dashboard': ['get'], '/doctor/profile': ['get', 'patch'], '/doctor/calendar': ['get'], '/doctor/availability': ['get', 'post'], '/doctor/availability/{id}': ['put', 'delete'], '/doctor/availability/exceptions': ['post'], '/doctor/availability/exceptions/{id}': ['delete'],
   '/documents': ['get', 'post'], '/documents/{id}': ['get', 'delete'], '/documents/{id}/download-url': ['post'], '/documents/{id}/grants': ['post'], '/documents/{id}/grants/{grantId}': ['delete'], '/documents/{id}/summaries': ['post'], '/summaries/{id}': ['get'],
   '/encounters/{id}/notes': ['post', 'patch'], '/notes/{id}/finalize': ['post'], '/notes/{id}/amend': ['post'],
   '/conversations': ['get'], '/conversations/{id}/messages': ['get', 'post'], '/conversations/{id}/read': ['post'],

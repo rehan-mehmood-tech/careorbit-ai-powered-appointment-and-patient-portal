@@ -11,7 +11,8 @@
     "test": "npm run build && node --test dist/app.test.js",
     "test:auth": "npm run build && node --test dist/auth/auth.test.js",
     "test:profiles": "npm run build && node --test dist/profiles/profiles.test.js",
-    "test:discovery": "npm run build && node --test dist/discovery/discovery.test.js"
+    "test:discovery": "npm run build && node --test dist/discovery/discovery.test.js",
+    "test:scheduling": "npm run build && node --test dist/scheduling/scheduling.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

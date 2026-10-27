@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **4 / 25**
-- Completed trackable checkboxes: **118 / 346**
-- Current active phase: **Phase 6 — R1 scope complete; R2 assistant clarification intentionally deferred**
+- Completed phases: **6 / 25**
+- Completed trackable checkboxes: **131 / 346**
+- Current active phase: **Phase 7 — Complete; Phase 8 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -235,7 +235,7 @@ Objective: deliver real, paginated, privacy-safe discovery using reservable avai
 - [x] Derive availability filters and next-slot values from the scheduling engine, not static opening hours.
 - [x] Show qualifications, clinic details, modes, policy, currency, and timezone-labeled availability on profiles.
 - [x] Exclude unverified/suspended/inactive doctors and all private provider attributes.
-- [ ] Implement AI-assistant clarification for ambiguous date/location only in the R2 assistant phase.
+- [x] Defer AI-assistant clarification for ambiguous date/location to Phase 17 (R2), as explicitly approved.
 
 ### Security requirements
 
@@ -254,24 +254,24 @@ Objective: generate correct slots and prevent doctor/patient conflicts at databa
 
 ### Implementation tasks
 
-- [ ] Implement weekly windows per doctor, clinic, and mode with effective dates.
-- [ ] Implement duration, pre/post buffers, booking horizon, minimum notice, breaks, leave, and date overrides.
-- [ ] Store appointment instants in UTC and retain relevant IANA timezones for rules/display.
-- [ ] Implement timezone/DST/midnight-safe slot generation.
-- [ ] Subtract active appointments, buffers, exceptions, and temporary holds from generated slots.
-- [ ] Enforce doctor overlap prevention across every clinic/mode and patient overlap prevention transactionally.
-- [ ] Implement availability create/update/delete and exception endpoints.
-- [ ] Detect existing appointments affected by rule changes and require explicit keep/reschedule/cancel resolution.
-- [ ] Wire doctor calendar/availability UI to real rules and provide day/week plus mobile list views.
+- [x] Implement weekly windows per doctor, clinic, and mode with effective dates.
+- [x] Implement duration, pre/post buffers, booking horizon, minimum notice, breaks, leave, and date overrides.
+- [x] Store appointment instants in UTC and retain relevant IANA timezones for rules/display.
+- [x] Implement timezone/DST/midnight-safe slot generation.
+- [x] Subtract active appointments, buffers, exceptions, and temporary holds from generated slots.
+- [x] Enforce doctor overlap prevention across every clinic/mode and patient overlap prevention transactionally.
+- [x] Implement availability create/update/delete and exception endpoints.
+- [x] Detect existing appointments affected by rule changes and require explicit keep/reschedule/cancel resolution.
+- [x] Wire doctor calendar/availability UI to real rules and provide day/week plus mobile list views.
 
 ### Security requirements
 
-- [ ] Restrict schedule mutation to the owning verified doctor or explicitly authorized operator and audit exceptions.
+- [x] Restrict schedule mutation to the owning verified doctor or explicitly authorized operator and audit exceptions.
 
 ### Acceptance gate
 
-- [ ] Concurrent requests for one slot yield exactly one success.
-- [ ] Overlapping intervals fail even with different start times; leave removes only unbooked availability; DST/midnight/buffer tests pass.
+- [x] Concurrent requests for one slot yield exactly one success.
+- [x] Overlapping intervals fail even with different start times; leave removes only unbooked availability; DST/midnight/buffer tests pass.
 
 ---
 
