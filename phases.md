@@ -5,9 +5,9 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 ## Progress summary
 
 - Total phases: **25** (Phase 0 through Phase 24)
-- Completed phases: **2 / 25**
-- Completed trackable checkboxes: **79 / 346**
-- Current active phase: **Phase 3 — Complete; Phase 4 is next in sequence**
+- Completed phases: **3 / 25**
+- Completed trackable checkboxes: **95 / 346**
+- Current active phase: **Phase 4 — Complete; Phase 5 is next in sequence**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -167,28 +167,28 @@ Objective: replace prototype client/Firebase authorization with the PRD's server
 
 ### Implementation tasks
 
-- [ ] Implement patient and unverified-doctor registration with normalized email and bcrypt hashing.
-- [ ] Prevent all public/admin-registration paths and ignore tampered role input.
-- [ ] Implement login, logout, short-lived access JWT, rotating refresh sessions, reuse detection, and revocation.
-- [ ] Store refresh credentials in secure HttpOnly SameSite cookies and implement CSRF protection for cookie-authenticated mutations.
-- [ ] Implement single-use expiring email verification and password-reset tokens without account enumeration.
-- [ ] Implement authenticated password change and revoke-other-session/current-session flows.
-- [ ] Implement account suspension checks that block new sessions and clinical actions while preserving history.
-- [ ] Implement server authorization middleware for role plus resource ownership/relationship checks.
-- [ ] Preserve only validated same-origin return destinations after expired login.
-- [ ] Wire the React auth provider to Express and remove security reliance on client route hiding.
-- [ ] Add profile bootstrap/onboarding state for patients and doctor applicants.
+- [x] Implement patient and unverified-doctor registration with normalized email and bcrypt hashing.
+- [x] Prevent all public/admin-registration paths and ignore tampered role input.
+- [x] Implement login, logout, short-lived access JWT, rotating refresh sessions, reuse detection, and revocation.
+- [x] Store refresh credentials in secure HttpOnly SameSite cookies and implement CSRF protection for cookie-authenticated mutations.
+- [x] Implement single-use expiring email verification and password-reset tokens without account enumeration.
+- [x] Implement authenticated password change and revoke-other-session/current-session flows.
+- [x] Implement account suspension checks that block new sessions and clinical actions while preserving history.
+- [x] Implement server authorization middleware for role plus resource ownership/relationship checks.
+- [x] Preserve only validated same-origin return destinations after expired login.
+- [x] Wire the React auth provider to Express and remove security reliance on client route hiding.
+- [x] Add profile bootstrap/onboarding state for patients and doctor applicants.
 
 ### Security requirements
 
-- [ ] Rate-limit registration, login, refresh, reset, and verification attempts by appropriate identifiers.
-- [ ] Hash session/reset/verification secrets at rest and rotate signing keys safely.
-- [ ] Audit authentication security events without logging credentials or tokens.
+- [x] Rate-limit registration, login, refresh, reset, and verification attempts by appropriate identifiers.
+- [x] Hash session/reset/verification secrets at rest and rotate signing keys safely.
+- [x] Audit authentication security events without logging credentials or tokens.
 
 ### Acceptance gate
 
-- [ ] Tests cover duplicate normalized email, bad/expired/reused credentials, forged roles, suspension, logout invalidation, refresh rotation, and CSRF.
-- [ ] The complete patient/doctor/admin RBAC matrix and tampered-resource-ID suite passes.
+- [x] Tests cover duplicate normalized email, bad/expired/reused credentials, forged roles, suspension, logout invalidation, refresh rotation, and CSRF.
+- [x] The complete patient/doctor/admin RBAC matrix and tampered-resource-ID suite passes.
 
 ---
 

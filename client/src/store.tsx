@@ -1,8 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { auth, db } from './services/firebase';
-import { readUser, signOut } from './services/auth';
+import { db } from './services/firebase';
+import { bootstrapSession, signOut } from './services/auth';
 import type { Appointment, AppointmentStatus, MedicalDocument, NotificationItem, Role, Toast, User } from './domain';
 
 interface StoreValue {
@@ -18,10 +17,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [appointments, setAppointments] = useState<Appointment[]>([]); const [documents, setDocuments] = useState<MedicalDocument[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]); const [toasts, setToasts] = useState<Toast[]>([]);
   const role = user?.role ?? null;
-  useEffect(() => onAuthStateChanged(auth, async firebaseUser => {
-    if (!firebaseUser) { setUser(null); setAppointments([]); setDocuments([]); setNotifications([]); setAuthLoading(false); return; }
-    try { setUser(await readUser(firebaseUser)); } catch { await signOut(); setUser(null); } finally { setAuthLoading(false); }
-  }), []);
+  useEffect(() => { let active=true; void bootstrapSession().then(value=>{if(active)setUser(value)}).finally(()=>{if(active)setAuthLoading(false)});return()=>{active=false}; }, []);
   useEffect(() => {
     if (!user) return; const field = user.role === 'patient' ? 'patientId' : user.role === 'doctor' ? 'doctorId' : null; const stops: Array<() => void> = [];
     const appointmentsQuery = field ? query(collection(db, 'appointments'), where(field, '==', user.id)) : query(collection(db, 'appointments'));

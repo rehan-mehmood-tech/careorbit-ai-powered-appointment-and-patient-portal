@@ -3,6 +3,7 @@ import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import type { Pool } from 'pg';
 import { config } from './config.js';
 import { errorHandler, notFoundHandler } from './errors.js';
@@ -41,10 +42,11 @@ export function createApp(pool: Pool, options: AppOptions = {}) {
   if (options.requireTls ?? config.REQUIRE_TLS) app.use(requireTls);
   app.use(express.json({ limit: options.bodyLimit ?? config.REQUEST_BODY_LIMIT, strict: true }));
   app.use(express.urlencoded({ extended: false, limit: options.bodyLimit ?? config.REQUEST_BODY_LIMIT }));
+  app.use(cookieParser());
   app.use(requestLogger);
   app.use('/health', createHealthRouter(pool));
   app.use(idempotency(pool));
-  app.use('/api', createApiRouter(
+  app.use('/api', createApiRouter(pool,
     { windowMs: options.rateWindowMs ?? config.RATE_LIMIT_WINDOW_MS, limit: options.defaultRateMax ?? config.RATE_LIMIT_DEFAULT_MAX },
     { windowMs: options.rateWindowMs ?? config.RATE_LIMIT_WINDOW_MS, limit: options.authRateMax ?? config.RATE_LIMIT_AUTH_MAX },
     options.enableTestRoutes ?? false,

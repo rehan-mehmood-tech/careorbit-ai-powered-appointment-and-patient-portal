@@ -18,6 +18,14 @@ const environmentSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().min(1000).default(60000),
   RATE_LIMIT_DEFAULT_MAX: z.coerce.number().int().min(1).default(120),
   RATE_LIMIT_AUTH_MAX: z.coerce.number().int().min(1).default(10),
+  JWT_SIGNING_KEYS: z.string().min(40),
+  JWT_ISSUER: z.string().min(3).default('careorbit-api'),
+  JWT_AUDIENCE: z.string().min(3).default('careorbit-web'),
+  ACCESS_TOKEN_MINUTES: z.coerce.number().int().min(5).max(30).default(10),
+  REFRESH_TOKEN_DAYS: z.coerce.number().int().min(1).max(90).default(30),
+  BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(14).default(12),
+  AUTH_TOKEN_TTL_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
+  COOKIE_DOMAIN: z.string().optional(),
 });
 
 const parsed = environmentSchema.safeParse(process.env);
@@ -29,4 +37,11 @@ if (!parsed.success) {
 export const config = {
   ...parsed.data,
   clientOrigins: parsed.data.CLIENT_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean),
+  jwtKeys: parsed.data.JWT_SIGNING_KEYS.split(',').map((entry) => {
+    const separator = entry.indexOf(':');
+    if (separator < 1 || entry.slice(separator + 1).length < 32) throw new Error('Invalid JWT_SIGNING_KEYS entry');
+    return { kid: entry.slice(0, separator), secret: entry.slice(separator + 1) };
+  }),
 };
+
+if (config.NODE_ENV === 'production' && config.JWT_SIGNING_KEYS.toLowerCase().includes('local')) throw new Error('Local JWT key is forbidden in production');

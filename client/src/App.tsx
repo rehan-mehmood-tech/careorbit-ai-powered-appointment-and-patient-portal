@@ -6,7 +6,8 @@ import { AppointmentDetail, Appointments, Booking, DoctorSearch, DocumentDetail,
 import { AdminAudit, AdminOverview, AdminReports, AdminTable, Availability, DoctorCalendar, DoctorMessages, DoctorOverview, DoctorProfile, PatientWorkspace } from './role-pages';
 import { ExtendedFeatures } from './extended';
 import { DoctorIntakes, IntakeAssistant } from './assistant';
-function Protected({area}:{area:'patient'|'doctor'|'admin'}){const {user,role,authLoading}=useStore();if(authLoading)return <main className="auth-loading">Loading your secure workspace…</main>;if(!user)return <Navigate to="/login" replace/>;if(role!==area)return <Navigate to={role==='patient'?'/app':`/${role}`} replace/>;return <AppShell><Outlet/></AppShell>}
+import { rememberReturnDestination } from './services/auth';
+function Protected({area}:{area:'patient'|'doctor'|'admin'}){const {user,role,authLoading}=useStore();if(authLoading)return <main className="auth-loading">Loading your secure workspace…</main>;if(!user){rememberReturnDestination();return <Navigate to="/login?expired=1" replace/>}if(role!==area)return <Navigate to={role==='patient'?'/app':`/${role}`} replace/>;return <AppShell><Outlet/></AppShell>}
 function NotFound(){return <main className="not-found"><span>404</span><h1>This page left the orbit.</h1><p>The destination doesn't exist or you don't have access.</p><a className="button primary" href="/">Return home</a></main>}
 function RoutedApp(){return <><Routes>
 <Route path="/" element={<Landing/>}/><Route path="/doctors" element={<PublicDoctors/>}/><Route path="/doctors/:id" element={<PublicDoctorProfile/>}/><Route path="/login" element={<AuthPage mode="login"/>}/><Route path="/register" element={<AuthPage mode="register"/>}/><Route path="/forgot-password" element={<AuthPage mode="forgot"/>}/><Route path="/help" element={<InfoPage type="help"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
