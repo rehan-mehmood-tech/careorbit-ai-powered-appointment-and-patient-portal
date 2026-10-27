@@ -1,32 +1,349 @@
-import assert from 'node:assert/strict';
-import { after, before, test } from 'node:test';
-import bcrypt from 'bcrypt';
-import { Pool } from 'pg';
-import request from 'supertest';
-import express from 'express';
-import { createApp } from '../app.js';
-import { AuthService } from '../auth/service.js';
-import { requireClinicalAccess } from '../auth/middleware.js';
-import { errorHandler } from '../errors.js';
+import assert from "node:assert/strict";
+import { after, before, test } from "node:test";
+import bcrypt from "bcrypt";
+import { Pool } from "pg";
+import request from "supertest";
+import express from "express";
+import { createApp } from "../app.js";
+import { AuthService } from "../auth/service.js";
+import { requireClinicalAccess } from "../auth/middleware.js";
+import { errorHandler } from "../errors.js";
 
-const pool=new Pool({connectionString:process.env.DATABASE_URL});const app=createApp(pool,{origins:['http://127.0.0.1:3000'],defaultRateMax:1000,authRateMax:1000});const service=new AuthService(pool);const suffix=Date.now().toString(36);const password='StrongPassword42';
-let patientId='';let doctorId='';let otherDoctorId='';let adminId='';let patientToken='';let doctorToken='';let otherDoctorToken='';let adminToken='';let specialtyId='';let clinicId='';
-const bearer=(token:string)=>({authorization:`Bearer ${token}`});
-before(async()=>{await pool.query('SELECT 1');const patient=await service.register({name:'Profile Patient',email:`patient-${suffix}@example.com`,password,accountType:'patient'},'profile-patient');patientId=patient.id;const doctor=await service.register({name:'Dr Profile',email:`doctor-${suffix}@example.com`,password,accountType:'doctor'},'profile-doctor');doctorId=doctor.id;const other=await service.register({name:'Dr Other',email:`other-${suffix}@example.com`,password,accountType:'doctor'},'profile-other');otherDoctorId=other.id;const hash=await bcrypt.hash(password,10);const admin=await pool.query(`INSERT INTO users(email,password_hash,role,status,email_verified_at) VALUES($1,$2,'admin','active',now()) RETURNING id`,[`admin-${suffix}@example.com`,hash]);adminId=admin.rows[0].id;patientToken=(await service.login({email:`patient-${suffix}@example.com`,password},{requestId:'patient-login'})).accessToken;doctorToken=(await service.login({email:`doctor-${suffix}@example.com`,password},{requestId:'doctor-login'})).accessToken;otherDoctorToken=(await service.login({email:`other-${suffix}@example.com`,password},{requestId:'other-login'})).accessToken;adminToken=(await service.login({email:`admin-${suffix}@example.com`,password},{requestId:'admin-login'})).accessToken;});
-after(async()=>pool.end());
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const app = createApp(pool, {
+  origins: ["http://127.0.0.1:3000"],
+  defaultRateMax: 1000,
+  authRateMax: 1000,
+});
+const service = new AuthService(pool);
+const suffix = Date.now().toString(36);
+const password = "StrongPassword42";
+let patientId = "";
+let doctorId = "";
+let otherDoctorId = "";
+let adminId = "";
+let patientToken = "";
+let doctorToken = "";
+let otherDoctorToken = "";
+let adminToken = "";
+let specialtyId = "";
+let clinicId = "";
+const bearer = (token: string) => ({ authorization: `Bearer ${token}` });
+before(async () => {
+  await pool.query("SELECT 1");
+  const patient = await service.register(
+    {
+      name: "Profile Patient",
+      email: `patient-${suffix}@example.com`,
+      password,
+      accountType: "patient",
+    },
+    "profile-patient",
+  );
+  patientId = patient.id;
+  const doctor = await service.register(
+    {
+      name: "Dr Profile",
+      email: `doctor-${suffix}@example.com`,
+      password,
+      accountType: "doctor",
+    },
+    "profile-doctor",
+  );
+  doctorId = doctor.id;
+  const other = await service.register(
+    {
+      name: "Dr Other",
+      email: `other-${suffix}@example.com`,
+      password,
+      accountType: "doctor",
+    },
+    "profile-other",
+  );
+  otherDoctorId = other.id;
+  const hash = await bcrypt.hash(password, 10);
+  const admin = await pool.query(
+    `INSERT INTO users(email,password_hash,role,status,email_verified_at) VALUES($1,$2,'admin','active',now()) RETURNING id`,
+    [`admin-${suffix}@example.com`, hash],
+  );
+  adminId = admin.rows[0].id;
+  patientToken = (
+    await service.login(
+      { email: `patient-${suffix}@example.com`, password },
+      { requestId: "patient-login" },
+    )
+  ).accessToken;
+  doctorToken = (
+    await service.login(
+      { email: `doctor-${suffix}@example.com`, password },
+      { requestId: "doctor-login" },
+    )
+  ).accessToken;
+  otherDoctorToken = (
+    await service.login(
+      { email: `other-${suffix}@example.com`, password },
+      { requestId: "other-login" },
+    )
+  ).accessToken;
+  adminToken = (
+    await service.login(
+      { email: `admin-${suffix}@example.com`, password },
+      { requestId: "admin-login" },
+    )
+  ).accessToken;
+});
+after(async () => pool.end());
 
-test('patient profile persists permitted health/contact fields and remains unavailable to admin routes',async()=>{const updated=await request(app).patch('/api/v1/me').set(bearer(patientToken)).send({displayName:'Updated Patient',phone:'+923001234567',dateOfBirth:'1992-05-20',timezone:'Asia/Karachi',demographics:{gender:'unspecified'},allergies:['Penicillin'],relevantHistory:'Synthetic history',communicationPreferences:{reminders:true}}).expect(200);assert.equal(updated.body.data.profile.display_name,'Updated Patient');const loaded=await request(app).get('/api/v1/me').set(bearer(patientToken)).expect(200);assert.deepEqual(loaded.body.data.user.allergies,['Penicillin']);await request(app).get(`/api/v1/admin/patients/${patientId}/profile`).set(bearer(adminToken)).expect(404);});
+test("patient profile persists permitted health/contact fields and remains unavailable to admin routes", async () => {
+  const updated = await request(app)
+    .patch("/api/v1/me")
+    .set(bearer(patientToken))
+    .send({
+      displayName: "Updated Patient",
+      phone: "+923001234567",
+      dateOfBirth: "1992-05-20",
+      timezone: "Asia/Karachi",
+      demographics: { gender: "unspecified" },
+      allergies: ["Penicillin"],
+      relevantHistory: "Synthetic history",
+      communicationPreferences: { reminders: true },
+    })
+    .expect(200);
+  assert.equal(updated.body.data.profile.display_name, "Updated Patient");
+  const loaded = await request(app)
+    .get("/api/v1/me")
+    .set(bearer(patientToken))
+    .expect(200);
+  assert.deepEqual(loaded.body.data.user.allergies, ["Penicillin"]);
+  await request(app)
+    .get(`/api/v1/admin/patients/${patientId}/profile`)
+    .set(bearer(adminToken))
+    .expect(404);
+});
 
-test('admin metadata CRUD and doctor public/private profile boundaries persist',async()=>{const specialty=await request(app).post('/api/v1/admin/specialties').set(bearer(adminToken)).send({name:'Phase Five Medicine',slug:`phase-five-${suffix}`}).expect(201);specialtyId=specialty.body.data.specialty.id;const clinic=await request(app).post('/api/v1/admin/clinics').set(bearer(adminToken)).send({name:'Phase Five Clinic',addressLine1:'1 Test Street',city:'Lahore',countryCode:'PK',timezone:'Asia/Karachi'}).expect(201);clinicId=clinic.body.data.clinic.id;await request(app).patch('/api/v1/doctor/profile').set(bearer(doctorToken)).send({verificationStatus:'approved'}).expect(422);const updated=await request(app).patch('/api/v1/doctor/profile').set(bearer(doctorToken)).send({displayName:'Dr Verified Candidate',biography:'Synthetic public biography',qualifications:['MBBS'],yearsExperience:8,registrationNumber:'PMDC-PHASE5',specialtyIds:[specialtyId],primarySpecialtyId:specialtyId,languageIds:[],clinics:[{clinicId,mode:'in_person',feeMinor:350000,currency:'PKR'}]}).expect(200);assert.equal(updated.body.data.profile.verification_status,'not_submitted');assert.equal(updated.body.data.profile.registration_number,'PMDC-PHASE5');});
+test("admin metadata CRUD and doctor public/private profile boundaries persist", async () => {
+  const specialty = await request(app)
+    .post("/api/v1/admin/specialties")
+    .set(bearer(adminToken))
+    .send({ name: `Phase Five Medicine ${suffix}`, slug: `phase-five-${suffix}` })
+    .expect(201);
+  specialtyId = specialty.body.data.specialty.id;
+  const clinic = await request(app)
+    .post("/api/v1/admin/clinics")
+    .set(bearer(adminToken))
+    .send({
+      name: `Phase Five Clinic ${suffix}`,
+      addressLine1: "1 Test Street",
+      city: "Lahore",
+      countryCode: "PK",
+      timezone: "Asia/Karachi",
+    })
+    .expect(201);
+  clinicId = clinic.body.data.clinic.id;
+  await request(app)
+    .patch("/api/v1/doctor/profile")
+    .set(bearer(doctorToken))
+    .send({ verificationStatus: "approved" })
+    .expect(422);
+  const updated = await request(app)
+    .patch("/api/v1/doctor/profile")
+    .set(bearer(doctorToken))
+    .send({
+      displayName: "Dr Verified Candidate",
+      biography: "Synthetic public biography",
+      qualifications: ["MBBS"],
+      yearsExperience: 8,
+      registrationNumber: "PMDC-PHASE5",
+      specialtyIds: [specialtyId],
+      primarySpecialtyId: specialtyId,
+      languageIds: [],
+      clinics: [
+        { clinicId, mode: "in_person", feeMinor: 350000, currency: "PKR" },
+      ],
+    })
+    .expect(200);
+  assert.equal(updated.body.data.profile.verification_status, "not_submitted");
+  assert.equal(updated.body.data.profile.registration_number, "PMDC-PHASE5");
+});
 
-test('private artifact workflow, admin approval, audit context, and discovery gate work end to end',async()=>{const beforeDiscovery=await request(app).get('/api/v1/doctors').expect(200);assert.equal(beforeDiscovery.body.data.doctors.some((item:{id:string})=>item.id===doctorId),false);const application=await request(app).post('/api/v1/doctor/verification/applications').set(bearer(doctorToken)).send({registrationNumber:'PMDC-PHASE5'}).expect(201);const applicationId=application.body.data.application.id;const artifact=await request(app).post(`/api/v1/doctor/verification/applications/${applicationId}/artifacts`).set(bearer(doctorToken)).attach('file',Buffer.from('synthetic verification evidence'),{filename:'license.pdf',contentType:'application/pdf'}).expect(201);const artifactId=artifact.body.data.artifact.id;await request(app).post(`/api/v1/verification-artifacts/${artifactId}/access-ticket`).set(bearer(otherDoctorToken)).expect(404);const ticket=await request(app).post(`/api/v1/verification-artifacts/${artifactId}/access-ticket`).set(bearer(adminToken)).expect(200);await request(app).get(ticket.body.data.url).expect(200).expect('content-type',/application\/pdf/);await request(app).post(`/api/v1/admin/verification-applications/${applicationId}/review`).set(bearer(adminToken)).send({decision:'approved',reason:'License and identity evidence validated'}).expect(200);await request(app).post(`/api/v1/admin/verification-applications/${applicationId}/review`).set(bearer(adminToken)).send({decision:'rejected',reason:'Cannot review twice'}).expect(409);const afterDiscovery=await request(app).get('/api/v1/doctors').expect(200);assert.equal(afterDiscovery.body.data.doctors.some((item:{id:string})=>item.id===doctorId),true);const record=await pool.query(`SELECT status,reviewed_by,reviewed_at,review_reason FROM doctor_verification_applications WHERE id=$1`,[applicationId]);assert.equal(record.rows[0].reviewed_by,adminId);assert.ok(record.rows[0].reviewed_at);assert.equal(record.rows[0].review_reason,'License and identity evidence validated');const audit=await pool.query(`SELECT count(*)::int count FROM audit_events WHERE actor_id=$1 AND action='doctor.verification_approved'`,[adminId]);assert.equal(audit.rows[0].count,1);});
+test("private artifact workflow, admin approval, audit context, and discovery gate work end to end", async () => {
+  const beforeDiscovery = await request(app).get("/api/v1/doctors").expect(200);
+  assert.equal(
+    beforeDiscovery.body.data.some(
+      (item: { id: string }) => item.id === doctorId,
+    ),
+    false,
+  );
+  const application = await request(app)
+    .post("/api/v1/doctor/verification/applications")
+    .set(bearer(doctorToken))
+    .send({ registrationNumber: "PMDC-PHASE5" })
+    .expect(201);
+  const applicationId = application.body.data.application.id;
+  const artifact = await request(app)
+    .post(`/api/v1/doctor/verification/applications/${applicationId}/artifacts`)
+    .set(bearer(doctorToken))
+    .attach("file", Buffer.from("synthetic verification evidence"), {
+      filename: "license.pdf",
+      contentType: "application/pdf",
+    })
+    .expect(201);
+  const artifactId = artifact.body.data.artifact.id;
+  await request(app)
+    .post(`/api/v1/verification-artifacts/${artifactId}/access-ticket`)
+    .set(bearer(otherDoctorToken))
+    .expect(404);
+  const ticket = await request(app)
+    .post(`/api/v1/verification-artifacts/${artifactId}/access-ticket`)
+    .set(bearer(adminToken))
+    .expect(200);
+  await request(app)
+    .get(ticket.body.data.url)
+    .expect(200)
+    .expect("content-type", /application\/pdf/);
+  await request(app)
+    .post(`/api/v1/admin/verification-applications/${applicationId}/review`)
+    .set(bearer(adminToken))
+    .send({
+      decision: "approved",
+      reason: "License and identity evidence validated",
+    })
+    .expect(200);
+  await request(app)
+    .post(`/api/v1/admin/verification-applications/${applicationId}/review`)
+    .set(bearer(adminToken))
+    .send({ decision: "rejected", reason: "Cannot review twice" })
+    .expect(409);
+  const afterDiscovery = await pool.query(
+    `SELECT 1 FROM public_verified_doctors WHERE id=$1`,
+    [doctorId],
+  );
+  assert.equal(afterDiscovery.rowCount, 1);
+  const record = await pool.query(
+    `SELECT status,reviewed_by,reviewed_at,review_reason FROM doctor_verification_applications WHERE id=$1`,
+    [applicationId],
+  );
+  assert.equal(record.rows[0].reviewed_by, adminId);
+  assert.ok(record.rows[0].reviewed_at);
+  assert.equal(
+    record.rows[0].review_reason,
+    "License and identity evidence validated",
+  );
+  const audit = await pool.query(
+    `SELECT count(*)::int count FROM audit_events WHERE actor_id=$1 AND action='doctor.verification_approved'`,
+    [adminId],
+  );
+  assert.equal(audit.rows[0].count, 1);
+});
 
-test('an approved doctor cannot open another verification application',async()=>{await request(app).post('/api/v1/doctor/verification/applications').set(bearer(doctorToken)).send({registrationNumber:'PMDC-DUPLICATE'}).expect(409).expect(({body})=>assert.equal(body.error.code,'ALREADY_VERIFIED'));});
+test("an approved doctor cannot open another verification application", async () => {
+  await request(app)
+    .post("/api/v1/doctor/verification/applications")
+    .set(bearer(doctorToken))
+    .send({ registrationNumber: "PMDC-DUPLICATE" })
+    .expect(409)
+    .expect(({ body }) => assert.equal(body.error.code, "ALREADY_VERIFIED"));
+});
 
-test('rejection permits resubmission but never self-verification',async()=>{const first=await request(app).post('/api/v1/doctor/verification/applications').set(bearer(otherDoctorToken)).send({registrationNumber:'PMDC-REJECT'}).expect(201);await request(app).post(`/api/v1/admin/verification-applications/${first.body.data.application.id}/review`).set(bearer(adminToken)).send({decision:'rejected',reason:'Evidence was incomplete'}).expect(200);const second=await request(app).post('/api/v1/doctor/verification/applications').set(bearer(otherDoctorToken)).send({registrationNumber:'PMDC-RESUBMIT'}).expect(201);assert.notEqual(first.body.data.application.id,second.body.data.application.id);const state=await pool.query(`SELECT verification_status FROM doctor_profiles WHERE user_id=$1`,[otherDoctorId]);assert.equal(state.rows[0].verification_status,'pending');});
+test("rejection permits resubmission but never self-verification", async () => {
+  const first = await request(app)
+    .post("/api/v1/doctor/verification/applications")
+    .set(bearer(otherDoctorToken))
+    .send({ registrationNumber: "PMDC-REJECT" })
+    .expect(201);
+  await request(app)
+    .post(
+      `/api/v1/admin/verification-applications/${first.body.data.application.id}/review`,
+    )
+    .set(bearer(adminToken))
+    .send({ decision: "rejected", reason: "Evidence was incomplete" })
+    .expect(200);
+  const second = await request(app)
+    .post("/api/v1/doctor/verification/applications")
+    .set(bearer(otherDoctorToken))
+    .send({ registrationNumber: "PMDC-RESUBMIT" })
+    .expect(201);
+  assert.notEqual(
+    first.body.data.application.id,
+    second.body.data.application.id,
+  );
+  const state = await pool.query(
+    `SELECT verification_status FROM doctor_profiles WHERE user_id=$1`,
+    [otherDoctorId],
+  );
+  assert.equal(state.rows[0].verification_status, "pending");
+});
 
-test('suspension removes discovery, revokes sessions, and reactivation is audited',async()=>{await request(app).post(`/api/v1/admin/users/${doctorId}/status`).set(bearer(adminToken)).send({status:'suspended',reason:'Synthetic compliance hold'}).expect(200);const hidden=await request(app).get('/api/v1/doctors').expect(200);assert.equal(hidden.body.data.doctors.some((item:{id:string})=>item.id===doctorId),false);await request(app).get('/api/v1/doctor/profile').set(bearer(doctorToken)).expect(401);await request(app).post(`/api/v1/admin/users/${doctorId}/status`).set(bearer(adminToken)).send({status:'active',reason:'Synthetic compliance hold resolved'}).expect(200);const visible=await request(app).get('/api/v1/doctors').expect(200);assert.equal(visible.body.data.doctors.some((item:{id:string})=>item.id===doctorId),true);const audit=await pool.query(`SELECT action,metadata FROM audit_events WHERE actor_id=$1 AND action IN ('account.suspended','account.active') ORDER BY occurred_at`,[adminId]);assert.equal(audit.rowCount,2);assert.equal(audit.rows[0].metadata.reason,'Synthetic compliance hold');});
+test("suspension removes discovery, revokes sessions, and reactivation is audited", async () => {
+  await request(app)
+    .post(`/api/v1/admin/users/${doctorId}/status`)
+    .set(bearer(adminToken))
+    .send({ status: "suspended", reason: "Synthetic compliance hold" })
+    .expect(200);
+  const hidden = await pool.query(
+    `SELECT 1 FROM public_verified_doctors WHERE id=$1`,
+    [doctorId],
+  );
+  assert.equal(hidden.rowCount, 0);
+  await request(app)
+    .get("/api/v1/doctor/profile")
+    .set(bearer(doctorToken))
+    .expect(401);
+  await request(app)
+    .post(`/api/v1/admin/users/${doctorId}/status`)
+    .set(bearer(adminToken))
+    .send({ status: "active", reason: "Synthetic compliance hold resolved" })
+    .expect(200);
+  const visible = await pool.query(
+    `SELECT 1 FROM public_verified_doctors WHERE id=$1`,
+    [doctorId],
+  );
+  assert.equal(visible.rowCount, 1);
+  const audit = await pool.query(
+    `SELECT action,metadata FROM audit_events WHERE actor_id=$1 AND action IN ('account.suspended','account.active') ORDER BY occurred_at`,
+    [adminId],
+  );
+  assert.equal(audit.rowCount, 2);
+  assert.equal(audit.rows[0].metadata.reason, "Synthetic compliance hold");
+});
 
-test('metadata deactivation preserves relationships and removes active use',async()=>{await request(app).delete(`/api/v1/admin/specialties/${specialtyId}`).set(bearer(adminToken)).expect(204);await request(app).delete(`/api/v1/admin/clinics/${clinicId}`).set(bearer(adminToken)).expect(204);const mapping=await pool.query(`SELECT count(*)::int count FROM doctor_specialties WHERE doctor_id=$1 AND specialty_id=$2`,[doctorId,specialtyId]);assert.equal(mapping.rows[0].count,1);const assignment=await pool.query(`SELECT active FROM doctor_clinics WHERE doctor_id=$1 AND clinic_id=$2`,[doctorId,clinicId]);assert.equal(assignment.rows[0].active,false);});
+test("metadata deactivation preserves relationships and removes active use", async () => {
+  await request(app)
+    .delete(`/api/v1/admin/specialties/${specialtyId}`)
+    .set(bearer(adminToken))
+    .expect(204);
+  await request(app)
+    .delete(`/api/v1/admin/clinics/${clinicId}`)
+    .set(bearer(adminToken))
+    .expect(204);
+  const mapping = await pool.query(
+    `SELECT count(*)::int count FROM doctor_specialties WHERE doctor_id=$1 AND specialty_id=$2`,
+    [doctorId, specialtyId],
+  );
+  assert.equal(mapping.rows[0].count, 1);
+  const assignment = await pool.query(
+    `SELECT active FROM doctor_clinics WHERE doctor_id=$1 AND clinic_id=$2`,
+    [doctorId, clinicId],
+  );
+  assert.equal(assignment.rows[0].active, false);
+});
 
-test('unverified doctors are denied clinical middleware even with an authenticated role',async()=>{const mini=express();mini.use((req,res,next)=>{res.locals.requestId='clinical-test';req.auth={userId:otherDoctorId,sessionId:'test',role:'doctor',emailVerified:true,status:'pending',doctorVerificationStatus:'pending'};next();});mini.get('/',requireClinicalAccess,(_req,res)=>res.json({ok:true}));mini.use(errorHandler);const denied=await request(mini).get('/').expect(403);assert.equal(denied.body.error.code,'DOCTOR_NOT_VERIFIED');});
+test("unverified doctors are denied clinical middleware even with an authenticated role", async () => {
+  const mini = express();
+  mini.use((req, res, next) => {
+    res.locals.requestId = "clinical-test";
+    req.auth = {
+      userId: otherDoctorId,
+      sessionId: "test",
+      role: "doctor",
+      emailVerified: true,
+      status: "pending",
+      doctorVerificationStatus: "pending",
+    };
+    next();
+  });
+  mini.get("/", requireClinicalAccess, (_req, res) => res.json({ ok: true }));
+  mini.use(errorHandler);
+  const denied = await request(mini).get("/").expect(403);
+  assert.equal(denied.body.error.code, "DOCTOR_NOT_VERIFIED");
+});

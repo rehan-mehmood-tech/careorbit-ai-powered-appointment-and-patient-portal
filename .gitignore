@@ -14,12 +14,44 @@ ai-service/.venv
 __pycache__/
 *.pyc
 *.log
+# Secrets and local environment overrides (examples remain tracked)
 .env
-.env.local
-.env.*.local
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.env
+*.secret
+*.secrets
+service-account*.json
+**/service-account*.json
 *.pem
 *.key
 
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+phases.md
+
+# Local databases, queues, object storage, caches, and generated state
+.pgdata/
+.postgresql*/
+.python*/
+.runtime/
+.minio/
+minio-data/
+redis-data/
+postgres-data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.coverage
+coverage/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
