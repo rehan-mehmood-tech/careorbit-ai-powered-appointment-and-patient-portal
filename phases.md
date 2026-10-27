@@ -6,8 +6,8 @@ Source of truth: `CareOrbit_PRD_and_UI_UX_Master_Prompt.md` v1.0 (Sections 1–1
 
 - Total phases: **25** (Phase 0 through Phase 24)
 - Completed phases: **7 / 25**
-- Completed trackable checkboxes: **145 / 346**
-- Current active phase: **Phase 8 — Complete; Phase 9 is next in sequence**
+- Completed trackable checkboxes: **154 / 346**
+- Current active phase: **Phase 9 — Implementation complete; acceptance verification remains**
 - Current release target: **R1 Core Portal**
 - Status rule: a phase is complete only when every implementation, security, test, and acceptance checkbox in that phase is complete. Screens backed only by local React state or static data remain pending.
 - Last audited: **27 October 2026**
@@ -312,18 +312,18 @@ Objective: make the patient experience accurate, persistent, private, and comple
 ### Implementation tasks
 
 - [x] Patient overview, appointments, documents, messages, history, notifications, settings, and assistant routes exist.
-- [ ] Populate next appointment, upcoming/past counts, recent doctors, document states, unread conversations, reminders, and quick actions from authorized APIs.
-- [ ] Implement appointment list/calendar, status/date/doctor filters, detail, and event history.
-- [ ] Implement visit history and encounter detail with deliberately published summaries only.
-- [ ] Ensure “my doctors” derives from booked/consulted relationships rather than an undocumented favorites model.
-- [ ] Implement profile, contact verification, password/session management, timezone, communication, privacy, AI, and sharing preferences.
-- [ ] Implement retention-aware data export and deletion-request workflows.
-- [ ] Add empty, loading, expired-session, access-denied, offline, partial-failure, and retry states.
-- [ ] Ensure dashboard counts reconcile exactly with source records.
+- [x] Populate next appointment, upcoming/past counts, recent doctors, document states, unread conversations, reminders, and quick actions from authorized APIs.
+- [x] Implement appointment list/calendar, status/date/doctor filters, detail, and event history.
+- [x] Implement visit history and encounter detail with deliberately published summaries only.
+- [x] Ensure “my doctors” derives from booked/consulted relationships rather than an undocumented favorites model.
+- [x] Implement profile, contact verification, password/session management, timezone, communication, privacy, AI, and sharing preferences.
+- [x] Implement retention-aware data export and deletion-request workflows.
+- [x] Add empty, loading, expired-session, access-denied, offline, partial-failure, and retry states.
+- [x] Ensure dashboard counts reconcile exactly with source records.
 
 ### Security requirements
 
-- [ ] Patient endpoints return only the authenticated patient's records and never provider-private notes.
+- [x] Patient endpoints return only the authenticated patient's records and never provider-private notes.
 
 ### Acceptance gate
 
